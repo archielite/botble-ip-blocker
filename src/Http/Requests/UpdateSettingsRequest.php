@@ -4,19 +4,21 @@ namespace ArchiElite\IpBlocker\Http\Requests;
 
 use Botble\Support\Http\Requests\Request;
 
-class UpdateIpBlockerRequest extends Request
+class UpdateSettingsRequest extends Request
 {
     protected function prepareForValidation(): void
     {
+        $ipAddresses = $this->input('ip_addresses');
+
         $this->merge([
-            'ip_addresses' => json_decode($this->input('ip_addresses'), true),
+            'ip_addresses' => $ipAddresses ? json_decode($ipAddresses, true) : [],
         ]);
     }
 
     public function rules(): array
     {
         return [
-            'ip_addresses' => ['required', 'array'],
+            'ip_addresses' => ['sometimes', 'array'],
             'ip_addresses.*.value' => ['required', 'ip'],
         ];
     }

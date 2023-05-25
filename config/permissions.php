@@ -3,6 +3,6 @@
 return [
     [
         'name' => 'IP Blocker',
-        'flag' => 'ip-blocker.loadIpBlocker',
+        'flag' => 'ip-blocker.settings',
     ],
 ];

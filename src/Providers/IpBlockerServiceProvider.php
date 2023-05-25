@@ -2,8 +2,12 @@
 
 namespace ArchiElite\IpBlocker\Providers;
 
+use ArchiElite\IpBlocker\Http\Middleware\IpBlockerMiddleware;
+use ArchiElite\IpBlocker\Models\History;
+use ArchiElite\IpBlocker\Repositories\Caches\IpBlockerCacheDecorator;
+use ArchiElite\IpBlocker\Repositories\Eloquent\IpBlockerRepository;
+use ArchiElite\IpBlocker\Repositories\Interfaces\IpBlockerInterface;
 use Botble\Base\Facades\DashboardMenu;
-use Botble\Base\Facades\Form;
 use Botble\Base\Traits\LoadAndPublishDataTrait;
 use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Support\Facades\Event;
@@ -13,6 +17,13 @@ class IpBlockerServiceProvider extends ServiceProvider
 {
     use LoadAndPublishDataTrait;
 
+    public function register(): void
+    {
+        $this->app->bind(IpBlockerInterface::class, function () {
+            return new IpBlockerCacheDecorator(new IpBlockerRepository(new History()));
+        });
+    }
+
     public function boot(): void
     {
         $this
@@ -20,23 +31,20 @@ class IpBlockerServiceProvider extends ServiceProvider
             ->loadAndPublishConfigurations(['permissions'])
             ->loadRoutes()
             ->loadAndPublishViews()
+            ->loadMigrations()
             ->loadAndPublishTranslations();
 
         Event::listen(RouteMatched::class, function () {
+            $this->app['router']->pushMiddlewareToGroup('web', IpBlockerMiddleware::class);
+
             DashboardMenu::registerItem([
                 'id' => 'cms-plugins-ip-blocker',
                 'priority' => 1001,
                 'parent_id' => 'cms-core-settings',
                 'name' => 'plugins/ip-blocker::ip-blocker.menu',
-                'url' => route('ip-blocker.loadIpBlocker'),
-                'permissions' => ['ip-blocker.loadIpBlocker'],
+                'url' => route('ip-blocker.settings'),
+                'permissions' => ['ip-blocker.settings'],
             ]);
         });
-
-        Form::component('tags', 'plugins/ip-blocker::forms.tags', [
-            'name',
-            'value' => null,
-            'attributes' => [],
-        ]);
     }
 }
