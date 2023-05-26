@@ -3,14 +3,12 @@
 namespace ArchiElite\IpBlocker;
 
 use Botble\PluginManagement\Abstracts\PluginOperationAbstract;
-use Botble\Setting\Facades\Setting;
+use Illuminate\Support\Facades\Schema;
 
 class Plugin extends PluginOperationAbstract
 {
-    public static function remove(): void
+    public static function removed(): void
     {
-        Setting::delete([
-            'histories',
-        ]);
+        Schema::dropIfExists('ip_blocker_logs');
     }
 }

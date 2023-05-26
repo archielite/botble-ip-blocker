@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class () extends Migration {
     public function up(): void
     {
-        Schema::create('histories', function (Blueprint $table) {
+        Schema::create('ip_blocker_logs', function (Blueprint $table) {
             $table->id();
             $table->string('ip_address');
             $table->integer('count_requests')->default(0);
@@ -17,6 +17,6 @@ return new class () extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('histories');
+        Schema::dropIfExists('ip_blocker_logs');
     }
 };
