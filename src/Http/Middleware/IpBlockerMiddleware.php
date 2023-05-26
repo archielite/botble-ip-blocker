@@ -13,6 +13,17 @@ class IpBlockerMiddleware
         return json_decode(setting('ip_blocker_addresses'), true);
     }
 
+    protected function checkIpRange(): bool
+    {
+        foreach ($this->getIps() as $ip) {
+            if (str_starts_with(request()->getClientIp(), trim($ip, '*'))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function handle(Request $request, Closure $next)
     {
         if (in_array($request->getClientIp(), $this->getIps())) {
