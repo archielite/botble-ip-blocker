@@ -43,7 +43,7 @@ class HistoryTable extends TableAbstract
     {
         $query = $this->repository->getModel()->select([
             'ip_address',
-            'count',
+            'count_requests',
             'updated_at',
         ]);
 
@@ -57,8 +57,8 @@ class HistoryTable extends TableAbstract
                 'title' => trans('plugins/ip-blocker::ip-blocker.ip_address'),
                 'class' => 'text-start',
             ],
-            'count' => [
-                'title' => trans('plugins/ip-blocker::ip-blocker.count'),
+            'count_requests' => [
+                'title' => trans('plugins/ip-blocker::ip-blocker.count_requests'),
                 'class' => 'text-start',
             ],
             'updated_at' => [

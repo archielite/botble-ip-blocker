@@ -10,7 +10,7 @@ return new class () extends Migration {
         Schema::create('histories', function (Blueprint $table) {
             $table->id();
             $table->string('ip_address');
-            $table->integer('count')->default(0);
+            $table->integer('count_requests')->default(0);
             $table->timestamps();
         });
     }

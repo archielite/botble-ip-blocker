@@ -10,6 +10,6 @@ class History extends BaseModel
 
     protected $fillable = [
         'ip_address',
-        'count',
+        'count_requests',
     ];
 }

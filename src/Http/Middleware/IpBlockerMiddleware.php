@@ -18,9 +18,12 @@ class IpBlockerMiddleware
         if (in_array($request->getClientIp(), $this->getIps())) {
             History::query()->updateOrCreate([
                 'ip_address' => $request->getClientIp(),
-            ])->increment('count');
+            ])->increment('count_requests');
 
-            abort(403);
+            return response()->view('plugins/ip-blocker::errors.403', [
+                'code' => 403,
+                'message' => trans('plugins/ip-blocker::ip-blocker.message'),
+            ]);
         }
 
         return $next($request);
