@@ -13,9 +13,14 @@ class IpBlockerMiddleware
         return json_decode(setting('ip_blocker_addresses'), true);
     }
 
+    protected function getIpsRange(): array
+    {
+        return json_decode(setting('ip_blocker_addresses_range'), true);
+    }
+
     protected function checkIpRange(): bool
     {
-        foreach ($this->getIps() as $ip) {
+        foreach ($this->getIpsRange() as $ip) {
             if (str_starts_with(request()->getClientIp(), trim($ip, '*'))) {
                 return true;
             }
@@ -26,7 +31,7 @@ class IpBlockerMiddleware
 
     public function handle(Request $request, Closure $next)
     {
-        if (in_array($request->getClientIp(), $this->getIps())) {
+        if (in_array($request->getClientIp(), $this->getIps()) || $this->checkIpRange() === true) {
             History::query()->updateOrCreate([
                 'ip_address' => $request->getClientIp(),
             ])->increment('count_requests');

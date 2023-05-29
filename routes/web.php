@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['namespace' => 'ArchiElite\IpBlocker\Http\Controllers', 'middleware' => ['web', 'core']], function () {
     Route::group(['prefix' => BaseHelper::getAdminPrefix(), 'middleware' => 'auth'], function () {
+        Route::resource('ip-blocker', 'IpBlockerController', ['names' => 'ip-blocker'])->only(['index', 'destroy']);
+
         Route::group(['prefix' => 'settings/ip-blocker'], function () {
             Route::match(['GET', 'POST'], '', [
                 'as' => 'ip-blocker.settings',
@@ -14,6 +16,30 @@ Route::group(['namespace' => 'ArchiElite\IpBlocker\Http\Controllers', 'middlewar
             Route::post('/update', [
                 'as' => 'ip-blocker.settings.update',
                 'uses' => 'IpBlockerController@updateSettings',
+                'permission' => 'ip-blocker.settings',
+            ]);
+
+            Route::delete('items/destroy', [
+                'as' => 'ip-blocker.deletes',
+                'uses' => 'IpBlockerController@deletes',
+                'permission' => 'ip-blocker.destroy',
+            ]);
+
+            Route::get('items/empty', [
+                'as' => 'ip-blocker.empty',
+                'uses' => 'IpBlockerController@deleteAll',
+                'permission' => 'ip-blocker.destroy',
+            ]);
+
+            Route::post('/check-secret-key', [
+                'as' => 'ip-blocker.settings.checkSecretKey',
+                'uses' => 'IpBlockerController@checkSecretKey',
+                'permission' => 'ip-blocker.settings',
+            ]);
+
+            Route::post('/update-available-countries', [
+                'as' => 'ip-blocker.settings.availableCountries',
+                'uses' => 'IpBlockerController@availableCountries',
                 'permission' => 'ip-blocker.settings',
             ]);
         });

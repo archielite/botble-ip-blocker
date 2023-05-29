@@ -30,6 +30,7 @@ class IpBlockerServiceProvider extends ServiceProvider
         $this
             ->setNamespace('plugins/ip-blocker')
             ->loadAndPublishConfigurations(['permissions'])
+            ->loadHelpers()
             ->loadRoutes()
             ->loadAndPublishViews()
             ->loadMigrations()
