@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['namespace' => 'ArchiElite\IpBlocker\Http\Controllers', 'middleware' => ['web', 'core']], function () {
     Route::group(['prefix' => BaseHelper::getAdminPrefix(), 'middleware' => 'auth'], function () {
-        Route::resource('ip-blocker', 'IpBlockerController', ['names' => 'ip-blocker'])->only(['index', 'destroy']);
+        Route::resource('settings/ip-blocker', 'IpBlockerController', ['names' => 'ip-blocker'])->only(['destroy']);
 
         Route::group(['prefix' => 'settings/ip-blocker'], function () {
             Route::match(['GET', 'POST'], '', [
@@ -19,13 +19,13 @@ Route::group(['namespace' => 'ArchiElite\IpBlocker\Http\Controllers', 'middlewar
                 'permission' => 'ip-blocker.settings',
             ]);
 
-            Route::delete('items/destroy', [
+            Route::delete('/deletes', [
                 'as' => 'ip-blocker.deletes',
                 'uses' => 'IpBlockerController@deletes',
                 'permission' => 'ip-blocker.destroy',
             ]);
 
-            Route::get('items/empty', [
+            Route::get('/empty', [
                 'as' => 'ip-blocker.empty',
                 'uses' => 'IpBlockerController@deleteAll',
                 'permission' => 'ip-blocker.destroy',

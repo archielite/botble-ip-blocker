@@ -2,6 +2,7 @@
 
 namespace ArchiElite\IpBlocker\Http\Controllers;
 
+use ArchiElite\IpBlocker\Http\Requests\AvailableCountriesRequest;
 use ArchiElite\IpBlocker\Http\Requests\CheckSecretKeyRequest;
 use ArchiElite\IpBlocker\Http\Requests\UpdateSettingsRequest;
 use ArchiElite\IpBlocker\Models\History;
@@ -32,6 +33,7 @@ class IpBlockerController extends BaseController
 
         Assets::addStylesDirectly('vendor/core/core/base/libraries/tagify/tagify.css')
             ->addScriptsDirectly([
+                'vendor/core/core/setting/js/setting.js',
                 'vendor/core/core/base/libraries/tagify/tagify.js',
                 'vendor/core/core/base/js/tags.js',
             ]);
@@ -71,11 +73,11 @@ class IpBlockerController extends BaseController
 
         $ipsRange = $request->input('ip_addresses_range');
 
-        $localIpRange = explode('.', $localIp);
+        $localIpsRange = explode('.', $localIp);
 
         $formatLocalIpsRange = implode('.', [
-            $localIpRange[0],
-            $localIpRange[1],
+            $localIpsRange[0],
+            $localIpsRange[1],
         ]);
 
         foreach ($ipsRange as $key => $value) {
@@ -99,19 +101,20 @@ class IpBlockerController extends BaseController
 
         if ($data->ok()) {
             setting()->set('ip_blocker_secret_key', $secretKey)->save();
+            setting()->set('ip_blocker_available_countries', '[]')->save();
 
             return $response
                 ->setNextUrl(route('ip-blocker.settings'))
-                ->setMessage(trans('plugins/ip-blocker::ip-blocker.activated_success'));
+                ->setMessage(trans('plugins/ip-blocker::ip-blocker.activation_succeeded'));
         }
 
         return $response
             ->setNextUrl(route('ip-blocker.settings'))
             ->setError()
-            ->setMessage(trans('plugins/ip-blocker::ip-blocker.activated_failed'));
+            ->setMessage(trans('plugins/ip-blocker::ip-blocker.activation_failed'));
     }
 
-    public function availableCountries(Request $request, BaseHttpResponse $response)
+    public function availableCountries(AvailableCountriesRequest $request, BaseHttpResponse $response)
     {
         $data = json_encode($request->input('available_countries'));
 
@@ -119,7 +122,7 @@ class IpBlockerController extends BaseController
 
         return $response
             ->setNextUrl(route('ip-blocker.settings'))
-            ->setMessage(trans('plugins/ip-blocker::ip-blocker.activated_success'));
+            ->setMessage(trans('plugins/ip-blocker::ip-blocker.update_settings_success'));
     }
 
     public function destroy(History $ipBlocker, Request $request, BaseHttpResponse $response)

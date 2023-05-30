@@ -1,7 +1,7 @@
 @extends(BaseHelper::getAdminMasterLayoutTemplate())
 
 @section('content')
-    <div>
+    <div class="max-width-1200">
         {!! Form::open(['route' => ['ip-blocker.settings.update']]) !!}
         <x-core-setting::section
                 :title="trans('plugins/ip-blocker::ip-blocker.ip_blocker_title')"
@@ -26,10 +26,11 @@
             {!! Form::open(['route' => ['ip-blocker.settings.checkSecretKey']]) !!}
             <x-core-setting::text-input
                     name="secret_key"
-                    :label="trans('plugins/ip-blocker::ip-blocker.api_secret_key')"
+                    :label="trans('plugins/ip-blocker::ip-blocker.api_secret_key_label')"
                     type="text"
                     :value="$secret_key"
-                    :placeholder="trans('plugins/ip-blocker::ip-blocker.api_secret_key')"
+                    :placeholder="trans('plugins/ip-blocker::ip-blocker.api_secret_key_placeholder')"
+                    :helperText="trans('plugins/ip-blocker::ip-blocker.api_secret_key_helper', ['link' => Html::link('https://ipinfo.io/pricing', attributes: ['target' => '_blank'])])"
             />
 
             <button class="btn btn-info" type="submit">
@@ -37,12 +38,12 @@
             </button>
             {!! Form::close() !!}
 
-            @if($secret_key != null)
+            @if($secret_key)
                 {!! Form::open(['route' => ['ip-blocker.settings.availableCountries']]) !!}
                 <x-core-setting::form-group class="mt-3">
                     <label class="text-title-field" for="available_countries">{{ trans('plugins/ip-blocker::ip-blocker.available_countries') }}</label>
                     <label>
-                        <input type="checkbox" class="check-all" data-set=".available-countries">
+                        <input type="checkbox" class="check-all" data-set=".available-countries" @if(empty($countriesCode) || empty(array_diff(array_keys(\Botble\Base\Supports\Helper::countries()), $countriesCode))) checked @endif>
                         {{ trans('plugins/ip-blocker::ip-blocker.all_countries') }}
                     </label>
                     <div class="form-group form-group-no-margin">
@@ -56,7 +57,7 @@
                                                 name="available_countries[]"
                                                 value="{{ $key }}"
                                                 id="available-countries-item-{{ $key }}"
-                                                @checked(in_array($key, $countriesCode))
+                                                @checked(empty($countriesCode) || in_array($key, $countriesCode))
                                         >
                                         <label for="available-countries-item-{{ $key }}">{{ $item }}</label>
                                     </li>
@@ -77,26 +78,9 @@
                 :title="trans('plugins/ip-blocker::ip-blocker.history')"
                 :description="trans('plugins/ip-blocker::ip-blocker.history_description')"
         >
-            <div class="table-wrapper" style="padding-top: 45px">
+            <div class="table-wrapper" style="padding-top: 25px">
                 {!! $historyTable->renderTable() !!}
             </div>
         </x-core-setting::section>
     </div>
 @endsection
-
-@push('footer')
-    <script>
-        $(document).on('change', '.check-all', event => {
-            let _self = $(event.currentTarget)
-            let set = _self.attr('data-set')
-            let checked = _self.prop('checked')
-            $(set).each((index, el) => {
-                if (checked) {
-                    $(el).prop('checked', true)
-                } else {
-                    $(el).prop('checked', false)
-                }
-            })
-        })
-    </script>
-@endpush

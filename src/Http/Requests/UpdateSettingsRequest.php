@@ -24,7 +24,6 @@ class UpdateSettingsRequest extends Request
             'ip_addresses.*.value' => ['required', 'ip'],
             'ip_addresses_range' => ['sometimes', 'array'],
             'ip_addresses_range.*.value' => ['required', 'regex:/^(?:\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])\.(?:\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])\.\*\z/'],
-            'api_secret_key' => ['sometimes', 'string'],
         ];
     }
 
