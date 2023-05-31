@@ -23,7 +23,7 @@
         {!! Form::close() !!}
 
         <x-core-setting::section>
-            {!! Form::open(['route' => ['ip-blocker.settings.checkSecretKey']]) !!}
+            {!! Form::open(['route' => ['ip-blocker.settings.check-secret-key']]) !!}
             <x-core-setting::text-input
                     name="secret_key"
                     :label="trans('plugins/ip-blocker::ip-blocker.api_secret_key_label')"
@@ -39,7 +39,7 @@
             {!! Form::close() !!}
 
             @if($secretKey)
-                {!! Form::open(['route' => ['ip-blocker.settings.availableCountries']]) !!}
+                {!! Form::open(['route' => ['ip-blocker.settings.available-countries']]) !!}
                 <x-core-setting::form-group class="mt-3">
                     <label class="text-title-field" for="available_countries">{{ trans('plugins/ip-blocker::ip-blocker.available_countries') }}</label>
                     <label>

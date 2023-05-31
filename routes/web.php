@@ -32,13 +32,13 @@ Route::group(['namespace' => 'ArchiElite\IpBlocker\Http\Controllers', 'middlewar
             ]);
 
             Route::post('check-secret-key', [
-                'as' => 'ip-blocker.settings.checkSecretKey',
+                'as' => 'ip-blocker.settings.check-secret-key',
                 'uses' => 'IpBlockerController@checkSecretKey',
                 'permission' => 'ip-blocker.settings',
             ]);
 
             Route::post('update-available-countries', [
-                'as' => 'ip-blocker.settings.availableCountries',
+                'as' => 'ip-blocker.settings.available-countries',
                 'uses' => 'IpBlockerController@availableCountries',
                 'permission' => 'ip-blocker.settings',
             ]);

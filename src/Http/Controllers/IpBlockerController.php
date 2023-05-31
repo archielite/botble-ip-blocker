@@ -13,9 +13,7 @@ use Botble\Base\Facades\Assets;
 use Botble\Base\Facades\PageTitle;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Base\Http\Responses\BaseHttpResponse;
-use Botble\Base\Supports\Helper;
 use Botble\Base\Traits\HasDeleteManyItemsTrait;
-use Botble\Ecommerce\Facades\EcommerceHelper;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -30,6 +28,10 @@ class IpBlockerController extends BaseController
 
     public function settings(Request $request, HistoryTable $historyTable)
     {
+        if ($request->expectsJson()) {
+            return $historyTable->renderTable();
+        }
+
         PageTitle::setTitle(trans('plugins/ip-blocker::ip-blocker.menu'));
 
         Assets::addStylesDirectly('vendor/core/core/base/libraries/tagify/tagify.css')
@@ -39,10 +41,6 @@ class IpBlockerController extends BaseController
                 'vendor/core/core/base/js/tags.js',
             ]);
 
-        if (EcommerceHelper::loadCountriesStatesCitiesFromPluginLocation()) {
-            Assets::addScriptsDirectly('vendor/core/plugins/location/js/location.js');
-        }
-
         $ips = implode(',', json_decode(setting('ip_blocker_addresses'), true));
 
         $ipsRange = implode(',', json_decode(setting('ip_blocker_addresses_range'), true));
@@ -50,10 +48,6 @@ class IpBlockerController extends BaseController
         $secretKey = setting('ip_blocker_secret_key');
 
         $countriesCode = json_decode(setting('ip_blocker_available_countries'), true);
-
-        if ($request->expectsJson()) {
-            return $historyTable->renderTable();
-        }
 
         return view('plugins/ip-blocker::settings', compact('ips', 'ipsRange', 'secretKey', 'countriesCode', 'historyTable'));
     }
