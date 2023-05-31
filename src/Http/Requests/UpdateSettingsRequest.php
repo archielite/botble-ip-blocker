@@ -30,8 +30,8 @@ class UpdateSettingsRequest extends Request
     public function attributes(): array
     {
         return [
-            'ip_addresses.*.value' => __('IP address'),
-            'ip_addresses_range.*.value' => __('IP address range'),
+            'ip_addresses.*.value' => trans('plugins/ip-blocker::ip-blocker.update_settings_ip_address'),
+            'ip_addresses_range.*.value' => trans('plugins/ip-blocker::ip-blocker.update_settings_ip_range'),
         ];
     }
 }

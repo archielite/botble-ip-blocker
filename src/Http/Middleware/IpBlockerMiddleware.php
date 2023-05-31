@@ -36,13 +36,7 @@ class IpBlockerMiddleware
             return true;
         }
 
-        $data = $this->callAPI();
-
-        if (! $data) {
-            return true;
-        }
-
-        $clientIp = $data['ip'];
+        $clientIp  = request()->ip();
 
         $explodeClientIp = explode('.', $clientIp);
 

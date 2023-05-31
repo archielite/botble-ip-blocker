@@ -25,4 +25,6 @@ return [
     'all_countries' => 'Allowed all countries',
     'activate' => 'Activate',
     'api_secret_key_helper' => 'Get IPinfo API key on :link',
+    'update_settings_ip_address' => 'IP address',
+    'update_settings_ip_range' => 'IP address range',
 ];

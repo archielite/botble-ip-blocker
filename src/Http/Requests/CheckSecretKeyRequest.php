@@ -9,7 +9,7 @@ class CheckSecretKeyRequest extends Request
     public function rules(): array
     {
         return [
-            'secret_key' => ['required', 'string'],
+            'secret_key' => ['required', 'string', 'size:14'],
         ];
     }
 }

@@ -1,4 +1,5 @@
 {
+  "id": "archielite/ip-blocker",
   "name": "IP Blocker",
   "namespace": "ArchiElite\\IpBlocker\\",
   "provider": "ArchiElite\\IpBlocker\\Providers\\IpBlockerServiceProvider",
