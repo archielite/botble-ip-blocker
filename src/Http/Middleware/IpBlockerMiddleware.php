@@ -12,27 +12,47 @@ use Session;
 
 class IpBlockerMiddleware
 {
-    protected function getIps(): array
+    protected function getSettings(): array
     {
-        return json_decode(setting('ip_blocker_addresses'), true);
+        return [
+            'ip' => setting('ip_blocker_addresses'),
+            'ip_range' => setting('ip_blocker_addresses_range'),
+            'allowed_countries' => setting('ip_blocker_available_countries'),
+            'secret_key' => setting('ip_blocker_secret_key'),
+        ];
     }
 
-    protected function getIpsRange(): array
+    protected function checkIpsRange(): bool
     {
-        return json_decode(setting('ip_blocker_addresses_range'), true);
-    }
+        $ipRange = $this->getSettings()['ip_range'];
 
-    protected function getIpsByCountryCode(): array
-    {
-        return json_decode(setting('ip_blocker_available_countries'), true);
-    }
+        if (! $ipRange) {
+            return true;
+        }
 
-    protected function checkIpRange(): bool
-    {
-        $clientIp = request()->getClientIp();
+        $ipRange = json_decode($ipRange, true);
 
-        foreach ($this->getIpsRange() as $ip) {
-            if (str_starts_with($clientIp, trim($ip, '*'))) {
+        if (! $ipRange) {
+            return true;
+        }
+
+        $data = $this->callAPI();
+
+        if (! $data) {
+            return true;
+        }
+
+        $clientIp = $data['ip'];
+
+        $explodeClientIp = explode('.', $clientIp);
+
+        $formatClientIp = implode('.', [
+            $explodeClientIp[0],
+            $explodeClientIp[1],
+        ]);
+
+        foreach ($ipRange as $ip) {
+            if (str_starts_with($formatClientIp, substr($ip, 0, -2))) {
                 return false;
             }
         }
@@ -44,37 +64,37 @@ class IpBlockerMiddleware
     {
         $systemCountriesCode = array_keys(Helper::countries());
 
-        $countriesCode = $this->getIpsByCountryCode();
+        $allowedCountries = $this->getSettings()['allowed_countries'];
 
-        if (empty($countriesCode) || empty(array_diff($systemCountriesCode, $countriesCode))) {
+        if (! $allowedCountries) {
             return true;
         }
 
-        $secretKey = setting('ip_blocker_secret_key');
+        $allowedCountries = json_decode($allowedCountries, true);
 
-        if (! $secretKey) {
+        if (! $allowedCountries) {
             return true;
         }
 
-        $clientIp = Helper::getIpFromThirdParty();
+        if (empty(array_diff($systemCountriesCode, $allowedCountries))) {
+            return true;
+        }
 
-        $sessionKey = 'check_response_' . md5($clientIp);
+        $sessionKey = 'ip_blocker_response_cache_' . md5(json_encode($this->getSettings()));
 
         if (Session::has($sessionKey)) {
-            return Session::get($sessionKey);
+             return Session::get($sessionKey);
         }
 
-        $response = Http::get("https://ipinfo.io/$clientIp/country?token=$secretKey");
+        $response = $this->callAPI();
 
-        if ($response->failed()) {
+        if (! $response) {
             Session::put($sessionKey, true);
 
             return true;
         }
 
-        $responseCountryCode = trim($response->body());
-
-        $isBlocked = in_array($responseCountryCode, $countriesCode, true);
+        $isBlocked = in_array($response['country'], $allowedCountries, true);
 
         Session::put($sessionKey, $isBlocked);
 
@@ -87,9 +107,11 @@ class IpBlockerMiddleware
             return $next($request);
         }
 
+        $response = $this->callAPI();
+
         if (
-            in_array($request->getClientIp(), $this->getIps()) ||
-            $this->checkIpRange() === false ||
+            (! $response || in_array($response['ip'], json_decode($this->getSettings()['ip'], true))) ||
+            $this->checkIpsRange() === false ||
             $this->checkIpsByCountryCode() === false
         ) {
             History::query()->updateOrCreate([
@@ -103,5 +125,32 @@ class IpBlockerMiddleware
         }
 
         return $next($request);
+    }
+
+    protected function callAPI(): array
+    {
+        $secretKey = $this->getSettings()['secret_key'];
+
+        if (! $secretKey) {
+            return [];
+        }
+
+        $cacheKey = 'ip_blocker_cache_responses_' . md5(json_encode($this->getSettings()));
+
+        if (Session::has($cacheKey) && $data = Session::get($cacheKey)) {
+            return $data;
+        }
+
+        $response = Http::withoutVerifying()->asJson()->get("https://ipinfo.io?token=$secretKey");
+
+        if ($response->failed()) {
+            return [];
+        }
+
+        $data = $response->json();
+
+        Session::put($cacheKey, $data);
+
+        return $data;
     }
 }

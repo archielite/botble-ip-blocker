@@ -13,6 +13,7 @@ use Botble\Base\Facades\Assets;
 use Botble\Base\Facades\PageTitle;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Base\Http\Responses\BaseHttpResponse;
+use Botble\Base\Supports\Helper;
 use Botble\Base\Traits\HasDeleteManyItemsTrait;
 use Botble\Ecommerce\Facades\EcommerceHelper;
 use Exception;
@@ -59,29 +60,29 @@ class IpBlockerController extends BaseController
 
     public function updateSettings(UpdateSettingsRequest $request, BaseHttpResponse $response)
     {
-        $data = $request->input('ip_addresses');
+        $ips = $request->input('ip_addresses');
 
-        $localIp = $request->ip();
+        $clientIp = $request->ip();
 
-        foreach ($data as $key => $value) {
-            if ($value['value'] === $localIp) {
-                unset($data[$key]);
+        foreach ($ips as $key => $value) {
+            if ($value['value'] === $clientIp) {
+                unset($ips[$key]);
             }
         }
 
-        setting()->set('ip_blocker_addresses', json_encode(collect($data)->pluck('value')))->save();
+        setting()->set('ip_blocker_addresses', json_encode(collect($ips)->pluck('value')))->save();
 
         $ipsRange = $request->input('ip_addresses_range');
 
-        $localIpsRange = explode('.', $localIp);
+        $explodeLocalIpsRange = explode('.', $clientIp);
 
         $formatLocalIpsRange = implode('.', [
-            $localIpsRange[0],
-            $localIpsRange[1],
+            $explodeLocalIpsRange[0],
+            $explodeLocalIpsRange[1],
         ]);
 
         foreach ($ipsRange as $key => $value) {
-            if (str_starts_with(trim($value['value'], '*'), $formatLocalIpsRange)) {
+            if (str_starts_with(substr($value['value'], 0, -2), $formatLocalIpsRange)) {
                 unset($ipsRange[$key]);
             }
         }
@@ -101,7 +102,6 @@ class IpBlockerController extends BaseController
 
         if ($data->ok()) {
             setting()->set('ip_blocker_secret_key', $secretKey)->save();
-            setting()->set('ip_blocker_available_countries', '[]')->save();
 
             return $response
                 ->setNextUrl(route('ip-blocker.settings'))

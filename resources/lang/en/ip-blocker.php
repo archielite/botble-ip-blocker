@@ -24,5 +24,5 @@ return [
     'available_countries' => 'Allowed IP from countries',
     'all_countries' => 'Allowed all countries',
     'activate' => 'Activate',
-    'api_secret_key_helper' => 'Get IPinfo API key on :link'
+    'api_secret_key_helper' => 'Get IPinfo API key on :link',
 ];

@@ -13,31 +13,31 @@ Route::group(['namespace' => 'ArchiElite\IpBlocker\Http\Controllers', 'middlewar
                 'uses' => 'IpBlockerController@settings',
             ]);
 
-            Route::post('/update', [
+            Route::post('update', [
                 'as' => 'ip-blocker.settings.update',
                 'uses' => 'IpBlockerController@updateSettings',
                 'permission' => 'ip-blocker.settings',
             ]);
 
-            Route::delete('/deletes', [
+            Route::delete('deletes', [
                 'as' => 'ip-blocker.deletes',
                 'uses' => 'IpBlockerController@deletes',
                 'permission' => 'ip-blocker.destroy',
             ]);
 
-            Route::get('/empty', [
+            Route::get('empty', [
                 'as' => 'ip-blocker.empty',
                 'uses' => 'IpBlockerController@deleteAll',
                 'permission' => 'ip-blocker.destroy',
             ]);
 
-            Route::post('/check-secret-key', [
+            Route::post('check-secret-key', [
                 'as' => 'ip-blocker.settings.checkSecretKey',
                 'uses' => 'IpBlockerController@checkSecretKey',
                 'permission' => 'ip-blocker.settings',
             ]);
 
-            Route::post('/update-available-countries', [
+            Route::post('update-available-countries', [
                 'as' => 'ip-blocker.settings.availableCountries',
                 'uses' => 'IpBlockerController@availableCountries',
                 'permission' => 'ip-blocker.settings',
