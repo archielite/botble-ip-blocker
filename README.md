@@ -12,11 +12,11 @@ IP Blocker is a plugin for Botble CMS that allows you to restrict user access vi
 
 **Install via Admin Panel**
 
-Go to the **Admin Panel** and click on the **Plugins** tab. Click on the "Add new" button, find the **URL Redirector** plugin and click on the "Install" button.
+Go to the **Admin Panel** and click on the **Plugins** tab. Click on the "Add new" button, find the **IP Blocker** plugin and click on the "Install" button.
 
 **Install manually**
 
-1. Download the plugin from the [Botble Marketplace](https://marketplace.botble.com/products/archielite/url-redirector).
+1. Download the plugin from the [Botble Marketplace](https://marketplace.botble.com/products/archielite/botble-ip-blocker).
 2. Extract the downloaded file and upload the extracted folder to the `platform/plugins` directory.
 3. Go to **Admin** > **Plugins** and click on the **Activate** button.
 

@@ -28,7 +28,7 @@
                     name="secret_key"
                     :label="trans('plugins/ip-blocker::ip-blocker.api_secret_key_label')"
                     type="text"
-                    :value="$secret_key"
+                    :value="$secretKey"
                     :placeholder="trans('plugins/ip-blocker::ip-blocker.api_secret_key_placeholder')"
                     :helperText="trans('plugins/ip-blocker::ip-blocker.api_secret_key_helper', ['link' => Html::link('https://ipinfo.io/pricing', attributes: ['target' => '_blank'])])"
             />
@@ -38,7 +38,7 @@
             </button>
             {!! Form::close() !!}
 
-            @if($secret_key)
+            @if($secretKey)
                 {!! Form::open(['route' => ['ip-blocker.settings.availableCountries']]) !!}
                 <x-core-setting::form-group class="mt-3">
                     <label class="text-title-field" for="available_countries">{{ trans('plugins/ip-blocker::ip-blocker.available_countries') }}</label>

@@ -47,7 +47,7 @@ class IpBlockerController extends BaseController
 
         $ipsRange = implode(',', json_decode(setting('ip_blocker_addresses_range'), true));
 
-        $secret_key = setting('ip_blocker_secret_key');
+        $secretKey = setting('ip_blocker_secret_key');
 
         $countriesCode = json_decode(setting('ip_blocker_available_countries'), true);
 
@@ -55,7 +55,7 @@ class IpBlockerController extends BaseController
             return $historyTable->renderTable();
         }
 
-        return view('plugins/ip-blocker::settings', compact('ips', 'ipsRange', 'secret_key', 'countriesCode', 'historyTable'));
+        return view('plugins/ip-blocker::settings', compact('ips', 'ipsRange', 'secretKey', 'countriesCode', 'historyTable'));
     }
 
     public function updateSettings(UpdateSettingsRequest $request, BaseHttpResponse $response)

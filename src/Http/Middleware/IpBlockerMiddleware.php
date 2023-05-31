@@ -36,7 +36,7 @@ class IpBlockerMiddleware
             return true;
         }
 
-        $clientIp  = request()->ip();
+        $clientIp = request()->ip();
 
         $explodeClientIp = explode('.', $clientIp);
 
@@ -104,9 +104,9 @@ class IpBlockerMiddleware
         $response = $this->callAPI();
 
         if (
-            (! $response || in_array($response['ip'], json_decode($this->getSettings()['ip'], true))) ||
-            $this->checkIpsRange() === false ||
-            $this->checkIpsByCountryCode() === false
+            (! $response || in_array($response['ip'], json_decode($this->getSettings()['ip'], true)))
+            || $this->checkIpsRange() === false
+            || $this->checkIpsByCountryCode() === false
         ) {
             History::query()->updateOrCreate([
                 'ip_address' => $request->getClientIp(),
