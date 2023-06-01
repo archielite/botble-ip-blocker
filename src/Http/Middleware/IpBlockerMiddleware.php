@@ -18,6 +18,10 @@ class IpBlockerMiddleware
 
         $response = IpBlocker::callAPI();
 
+        if (isset($response['hasRateLimit'])) {
+            return $next($request);
+        }
+
         if (
             (! $response || in_array($response['ip'], json_decode(IpBlocker::getSettings()['ip'], true)))
             || IpBlocker::checkIpsRange() === false

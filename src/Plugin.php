@@ -17,6 +17,7 @@ class Plugin extends PluginOperationAbstract
             'ip_blocker_addresses_range',
             'ip_blocker_available_countries',
             'ip_blocker_secret_key',
+            'ip_blocker_rate_limits_at',
         ]);
     }
 }

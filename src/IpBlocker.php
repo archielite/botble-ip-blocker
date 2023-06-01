@@ -3,24 +3,50 @@
 namespace ArchiElite\IpBlocker;
 
 use Botble\Base\Supports\Helper;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
-use Session;
+use Illuminate\Support\Facades\Session;
 
 class IpBlocker
 {
+    public static function getSettingKey(string $name): string
+    {
+        return "ip_blocker_$name";
+    }
+
     public static function getSettings(): array
     {
         return [
-            'ip' => setting('ip_blocker_addresses'),
-            'ip_range' => setting('ip_blocker_addresses_range'),
-            'allowed_countries' => setting('ip_blocker_available_countries'),
-            'secret_key' => setting('ip_blocker_secret_key'),
+            'ip' => self::getSetting('addresses'),
+            'ip_range' => self::getSetting('addresses_range'),
+            'allowed_countries' => self::getSetting('available_countries'),
+            'secret_key' => self::getSetting('secret_key'),
+            'rate_limits_at' => self::getSetting('rate_limits_at'),
         ];
+    }
+
+    public static function getSetting(string $name, mixed $default = null): mixed
+    {
+        return setting(self::getSettingKey($name), $default);
+    }
+
+    public static function setSetting(string $name, mixed $value = null, bool $saveNow = false): void
+    {
+        setting()->set(self::getSettingKey($name), $value);
+
+        if ($saveNow) {
+            self::saveSetting();
+        }
+    }
+
+    public static function saveSetting(): void
+    {
+        setting()->save();
     }
 
     public static function checkIpsRange(): bool
     {
-        $ipRange = self::getSettings()['ip_range'];
+        $ipRange = self::getSetting('ip_range');
 
         if (! $ipRange) {
             return true;
@@ -54,7 +80,7 @@ class IpBlocker
     {
         $systemCountriesCode = array_keys(Helper::countries());
 
-        $allowedCountries = self::getSettings()['allowed_countries'];
+        $allowedCountries = self::getSetting('available_countries', []);
 
         if (! $allowedCountries) {
             return true;
@@ -93,7 +119,7 @@ class IpBlocker
 
     public static function callAPI(): array
     {
-        $secretKey = self::getSettings()['secret_key'];
+        $secretKey = self::getSetting('secret_key');
 
         if (! $secretKey) {
             return [];
@@ -105,7 +131,29 @@ class IpBlocker
             return $data;
         }
 
+        if ($rateLimitAt = setting('ip_blocker_rate_limits_at')) {
+            $rateLimitDateTime = Carbon::parse($rateLimitAt);
+
+            $firstDayOfMonth = $rateLimitDateTime->firstOfMonth();
+            $lastDayOfMonth = $rateLimitDateTime->clone()->lastOfMonth();
+
+            if (! Carbon::now()->between($firstDayOfMonth, $lastDayOfMonth)) {
+                self::setSetting('rate_limits_at', null, true);
+                $rateLimitAt = null;
+            }
+        }
+
+        if ($rateLimitAt) {
+            return [
+                'hasRateLimit' => true,
+            ];
+        }
+
         $response = Http::withoutVerifying()->asJson()->get("https://ipinfo.io?token=$secretKey");
+
+        if ($response->json('status') === 429) {
+            self::setSetting('rate_limits_at', Carbon::now()->toIso8601String(), true);
+        }
 
         if ($response->failed()) {
             return [];
