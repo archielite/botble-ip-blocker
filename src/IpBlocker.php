@@ -46,7 +46,7 @@ class IpBlocker
 
     public static function checkIpsRange(): bool
     {
-        $ipRange = self::getSetting('ip_range');
+        $ipRange = self::getSetting('addresses_range');
 
         if (! $ipRange) {
             return true;
