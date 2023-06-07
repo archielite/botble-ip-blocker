@@ -6,6 +6,7 @@ use ArchiElite\IpBlocker\IpBlocker;
 use ArchiElite\IpBlocker\Models\History;
 use Illuminate\Http\Request;
 use Closure;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
 class IpBlockerMiddleware
@@ -18,25 +19,43 @@ class IpBlockerMiddleware
 
         $response = IpBlocker::callAPI();
 
+        $clientIp = $request->ip();
+
         if (isset($response['hasRateLimit'])) {
-            return $next($request);
+            if (
+                ! (in_array($clientIp, json_decode(IpBlocker::getSettings('ip'), true))
+                || IpBlocker::checkIpsRange() === false)
+            ) {
+                return $next($request);
+            }
+
+            History::query()->updateOrCreate([
+                'ip_address' => $clientIp,
+            ])->increment('count_requests');
+
+            return $this->showErrors();
         }
 
         if (
-            (! $response || in_array($response['ip'], json_decode(IpBlocker::getSettings()['ip'], true)))
+            (in_array($clientIp, json_decode(IpBlocker::getSettings('ip'), true)))
             || IpBlocker::checkIpsRange() === false
             || IpBlocker::checkIpsByCountryCode() === false
         ) {
             History::query()->updateOrCreate([
-                'ip_address' => $request->getClientIp(),
+                'ip_address' => $clientIp,
             ])->increment('count_requests');
 
-            return response()->view('plugins/ip-blocker::errors.403', [
-                'code' => 403,
-                'message' => trans('plugins/ip-blocker::ip-blocker.message'),
-            ]);
+            return $this->showErrors();
         }
 
         return $next($request);
+    }
+
+    protected function showErrors(): Response
+    {
+        return response()->view('plugins/ip-blocker::errors.403', [
+            'code' => 403,
+            'message' => trans('plugins/ip-blocker::ip-blocker.message'),
+        ]);
     }
 }

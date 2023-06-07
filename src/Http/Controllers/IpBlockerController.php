@@ -5,6 +5,7 @@ namespace ArchiElite\IpBlocker\Http\Controllers;
 use ArchiElite\IpBlocker\Http\Requests\AvailableCountriesRequest;
 use ArchiElite\IpBlocker\Http\Requests\CheckSecretKeyRequest;
 use ArchiElite\IpBlocker\Http\Requests\UpdateSettingsRequest;
+use ArchiElite\IpBlocker\IpBlocker;
 use ArchiElite\IpBlocker\Models\History;
 use ArchiElite\IpBlocker\Repositories\Interfaces\IpBlockerInterface;
 use ArchiElite\IpBlocker\Tables\HistoryTable;
@@ -16,7 +17,6 @@ use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Base\Traits\HasDeleteManyItemsTrait;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 
 class IpBlockerController extends BaseController
 {
@@ -68,15 +68,15 @@ class IpBlockerController extends BaseController
 
         $ipsRange = $request->input('ip_addresses_range');
 
-        $explodeLocalIpsRange = explode('.', $clientIp);
+        $explodeClientIpsRange = explode('.', $clientIp);
 
-        $formatLocalIpsRange = implode('.', [
-            $explodeLocalIpsRange[0],
-            $explodeLocalIpsRange[1],
+        $formatClientIpsRange = implode('.', [
+            $explodeClientIpsRange[0],
+            $explodeClientIpsRange[1],
         ]);
 
         foreach ($ipsRange as $key => $value) {
-            if (str_starts_with(substr($value['value'], 0, -2), $formatLocalIpsRange)) {
+            if (str_starts_with(substr($value['value'], 0, -2), $formatClientIpsRange)) {
                 unset($ipsRange[$key]);
             }
         }
@@ -92,14 +92,14 @@ class IpBlockerController extends BaseController
     {
         $secretKey = $request->input('secret_key');
 
-        $data = Http::get("https://ipinfo.io?token=$secretKey");
+        $data = IpBlocker::checkApiResponse($secretKey);
 
         if ($data->ok()) {
             setting()->set('ip_blocker_secret_key', $secretKey)->save();
 
             return $response
                 ->setNextUrl(route('ip-blocker.settings'))
-                ->setMessage(trans('plugins/ip-blocker::ip-blocker.activation_succeeded'));
+                ->setMessage(trans('plugins/ip-blocker::ip-blocker.activation_success'));
         }
 
         return $response
