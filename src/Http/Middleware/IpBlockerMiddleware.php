@@ -21,10 +21,10 @@ class IpBlockerMiddleware
 
         $clientIp = $request->ip();
 
-        if (isset($response['hasRateLimit'])) {
+        if (isset($response['hasRateLimit']) && is_array(json_decode(IpBlocker::getSettings('ip')))) {
             if (
                 ! (in_array($clientIp, json_decode(IpBlocker::getSettings('ip'), true))
-                || IpBlocker::checkIpsRange() === false)
+                    || IpBlocker::checkwildcardIPAddress() === false)
             ) {
                 return $next($request);
             }
@@ -35,10 +35,10 @@ class IpBlockerMiddleware
 
             return $this->showErrors();
         }
-
         if (
-            (in_array($clientIp, json_decode(IpBlocker::getSettings('ip'), true)))
-            || IpBlocker::checkIpsRange() === false
+            is_array(json_decode(IpBlocker::getSettings('ip')))
+            && (in_array($clientIp, json_decode(IpBlocker::getSettings('ip'), true)))
+            || IpBlocker::checkwildcardIPAddress() === false
             || IpBlocker::checkIpsByCountryCode() === false
         ) {
             History::query()->updateOrCreate([

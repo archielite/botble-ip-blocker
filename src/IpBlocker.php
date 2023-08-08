@@ -52,7 +52,7 @@ class IpBlocker
         setting()->save();
     }
 
-    public static function checkIpsRange(): bool
+    public static function checkwildcardIPAddress(): bool
     {
         $ipRange = self::getSettings('ip_range');
 
