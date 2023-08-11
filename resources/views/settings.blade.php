@@ -12,9 +12,9 @@
 
             {!! Form::text('ip_addresses', $ips, ['class' => 'tags mb-3', 'placeholder' => trans('plugins/ip-blocker::ip-blocker.please_enter_ip_address')]) !!}
 
-            <label>{{ __('plugins/ip-blocker::ip-blocker.please_enter_ip_addresses_range') }}</label>
+            <label>{{ __('plugins/ip-blocker::ip-blocker.please_enter_wildcard_ip_address') }}</label>
 
-            {!! Form::text('ip_addresses_range', $ipsRange, ['class' => 'tags mb-3', 'placeholder' => trans('plugins/ip-blocker::ip-blocker.please_enter_ip_addresses_range')]) !!}
+            {!! Form::text('wildcard_ip_address', $wildcardIPAddress, ['class' => 'tags mb-3', 'placeholder' => trans('plugins/ip-blocker::ip-blocker.please_enter_wildcard_ip_address')]) !!}
 
             <button class="btn btn-info" type="submit">
                 {{ trans('plugins/ip-blocker::ip-blocker.save_settings') }}

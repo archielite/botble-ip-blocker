@@ -41,15 +41,16 @@ class IpBlockerController extends BaseController
                 'vendor/core/core/base/js/tags.js',
             ]);
 
-        $ips = implode(',', json_decode(setting('ip_blocker_addresses'), true));
 
-        $ipsRange = implode(',', json_decode(setting('ip_blocker_addresses_range'), true));
+        $ips = implode(',', json_decode((string) setting('ip_blocker_addresses', ''), true) ?: []);
+
+        $wildcardIPAddress = implode(',', json_decode((string) setting('ip_blocker_addresses_range', ''), true) ?: []);
 
         $secretKey = setting('ip_blocker_secret_key');
 
         $countriesCode = json_decode(setting('ip_blocker_available_countries'), true);
 
-        return view('plugins/ip-blocker::settings', compact('ips', 'ipsRange', 'secretKey', 'countriesCode', 'historyTable'));
+        return view('plugins/ip-blocker::settings', compact('ips', 'wildcardIPAddress', 'secretKey', 'countriesCode', 'historyTable'));
     }
 
     public function updateSettings(UpdateSettingsRequest $request, BaseHttpResponse $response)
@@ -66,22 +67,22 @@ class IpBlockerController extends BaseController
 
         setting()->set('ip_blocker_addresses', json_encode(collect($ips)->pluck('value')))->save();
 
-        $ipsRange = $request->input('ip_addresses_range');
+        $wildcardIPAddress = $request->input('wildcard_ip_address');
 
-        $explodeClientIpsRange = explode('.', $clientIp);
+        $explodeClientwildcardIPAddress = explode('.', $clientIp);
 
-        $formatClientIpsRange = implode('.', [
-            $explodeClientIpsRange[0],
-            $explodeClientIpsRange[1],
+        $formatClientwildcardIPAddress = implode('.', [
+            $explodeClientwildcardIPAddress[0],
+            $explodeClientwildcardIPAddress[1],
         ]);
 
-        foreach ($ipsRange as $key => $value) {
-            if (str_starts_with(substr($value['value'], 0, -2), $formatClientIpsRange)) {
-                unset($ipsRange[$key]);
+        foreach ($wildcardIPAddress as $key => $value) {
+            if (str_starts_with(substr($value['value'], 0, -2), $formatClientwildcardIPAddress)) {
+                unset($wildcardIPAddress[$key]);
             }
         }
 
-        setting()->set('ip_blocker_addresses_range', json_encode(collect($ipsRange)->pluck('value')))->save();
+        setting()->set('ip_blocker_addresses_range', json_encode(collect($wildcardIPAddress)->pluck('value')))->save();
 
         return $response
             ->setNextUrl(route('ip-blocker.settings'))

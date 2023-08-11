@@ -14,7 +14,7 @@ return [
     'ip_blocker_description' => 'List of blocked IP addresses',
     'history_description' => 'Access history of blocked IP addresses',
     'message' => 'Your IP has been blocked.',
-    'please_enter_ip_addresses_range' => 'Please enter IP Address Range (Example: 192.168.*)',
+    'please_enter_wildcard_ip_address' => 'Please enter Wildcard IP Address (Example: 192.168.*)',
     'delete_all' => 'Delete all records',
     'delete_success' => 'Delete success',
     'api_secret_key_label' => 'API secret key',
@@ -26,5 +26,5 @@ return [
     'activate' => 'Activate',
     'api_secret_key_helper' => 'Go to :link and get the API key to detach the IP',
     'update_settings_ip_address' => 'IP address',
-    'update_settings_ip_range' => 'IP address range',
+    'update_settings_wildcard_ip' => 'Wildcard IP address',
 ];
