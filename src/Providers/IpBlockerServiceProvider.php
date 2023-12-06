@@ -10,6 +10,7 @@ use ArchiElite\IpBlocker\Repositories\Interfaces\IpBlockerInterface;
 use Botble\Base\Facades\DashboardMenu;
 use Botble\Base\Traits\LoadAndPublishDataTrait;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Database\Console\PruneCommand;
 use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
@@ -49,10 +50,10 @@ class IpBlockerServiceProvider extends ServiceProvider
             ]);
         });
 
-        $this->app->booted(function () {
-            $schedule = $this->app->make(Schedule::class);
-
-            $schedule->command('model:prune', ['--model' => History::class])->dailyAt('00:30');
-        });
+        if ($this->app->runningInConsole()) {
+            $this->app->afterResolving(Schedule::class, function (Schedule $schedule) {
+                $schedule->command(PruneCommand::class, ['--model' => History::class])->dailyAt('00:30');
+            });
+        }
     }
 }
