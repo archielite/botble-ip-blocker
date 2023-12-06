@@ -5,6 +5,6 @@
   "provider": "ArchiElite\\IpBlocker\\Providers\\IpBlockerServiceProvider",
   "author": "Archi Elite",
   "url": "https://archielite.com",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "IP Blocker is blocks access to specific IP addresses"
 }
