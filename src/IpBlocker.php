@@ -112,7 +112,7 @@ class IpBlocker
 
         $response = self::callAPI();
 
-        if (! $response) {
+        if (! $response || empty($response['country'])) {
             Session::put($sessionKey, true);
 
             return true;
