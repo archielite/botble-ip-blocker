@@ -4,8 +4,8 @@ namespace ArchiElite\IpBlocker\Http\Middleware;
 
 use ArchiElite\IpBlocker\IpBlocker;
 use ArchiElite\IpBlocker\Models\History;
-use Illuminate\Http\Request;
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 

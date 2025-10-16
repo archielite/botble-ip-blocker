@@ -41,7 +41,6 @@ class IpBlockerController extends BaseController
                 'vendor/core/core/base/js/tags.js',
             ]);
 
-
         $ips = implode(',', json_decode((string) setting('ip_blocker_addresses', ''), true) ?: []);
 
         $wildcardIPAddress = implode(',', json_decode((string) setting('ip_blocker_addresses_range', ''), true) ?: []);

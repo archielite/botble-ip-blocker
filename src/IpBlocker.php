@@ -16,7 +16,7 @@ class IpBlocker
         return "ip_blocker_$name";
     }
 
-    public static function getSettings(string $key = null, $default = null): array|string|null
+    public static function getSettings(?string $key = null, $default = null): array|string|null
     {
         $settings = [
             'ip' => self::getSetting('addresses'),
@@ -174,7 +174,7 @@ class IpBlocker
         return $data;
     }
 
-    public static function checkApiResponse(string $secretKey = null): Response
+    public static function checkApiResponse(?string $secretKey = null): Response
     {
         return Http::withoutVerifying()->asJson()->get("https://ipinfo.io?token=$secretKey");
     }

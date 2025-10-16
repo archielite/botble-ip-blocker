@@ -9,22 +9,14 @@ use Botble\Base\Facades\Html;
 use Botble\Table\Abstracts\TableAbstract;
 use Botble\Table\DataTables;
 use Botble\Table\Supports\Builder;
-use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Database\Query\Builder as QueryBuilder;
+use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
 class HistoryTable extends TableAbstract
 {
-    protected $view = 'plugins/ip-blocker::tables.simple-table';
-
-    protected $hasActions = true;
-
-    protected $hasCheckbox = true;
-
-    protected $hasOperations = true;
-
     public function __construct(DataTables $table, UrlGenerator $urlGenerator, IpBlockerInterface $ipBlockerRepository)
     {
         parent::__construct($table, $urlGenerator);
@@ -35,6 +27,8 @@ class HistoryTable extends TableAbstract
             $this->hasOperations = false;
             $this->hasActions = false;
         }
+
+        $this->view = 'plugins/ip-blocker::tables.simple-table';
     }
 
     public function ajax(): JsonResponse
@@ -56,12 +50,13 @@ class HistoryTable extends TableAbstract
 
     public function query(): Relation|Builder|QueryBuilder
     {
-        $query = $this->repository->getModel()->select([
-            'id',
-            'ip_address',
-            'count_requests',
-            'updated_at',
-        ]);
+        $query = History::query()
+            ->select([
+                'id',
+                'ip_address',
+                'count_requests',
+                'updated_at',
+            ]);
 
         return $this->applyScopes($query);
     }
@@ -94,7 +89,9 @@ class HistoryTable extends TableAbstract
         return [
             'empty' => [
                 'link' => route('ip-blocker.empty'),
-                'text' => Html::tag('i', '', ['class' => 'fa fa-trash'])->toHtml() . ' ' . trans('plugins/ip-blocker::ip-blocker.delete_all'),
+                'text' => Html::tag('i', '', ['class' => 'fa fa-trash'])->toHtml() . ' ' . trans(
+                    'plugins/ip-blocker::ip-blocker.delete_all'
+                ),
             ],
         ];
     }
