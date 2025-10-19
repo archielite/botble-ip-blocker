@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class () extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('ip_blocker_logs')) {
+            return;
+        }
+
         Schema::create('ip_blocker_logs', function (Blueprint $table) {
             $table->id();
             $table->string('ip_address');
